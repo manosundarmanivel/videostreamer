@@ -1,0 +1,6 @@
+@TrainingVideoAPI_HostAddress = http://localhost:5261
+
+GET {{TrainingVideoAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
