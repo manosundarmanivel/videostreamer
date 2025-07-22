@@ -1,0 +1,47 @@
+trigger:
+- main
+
+pool:
+  name: Default
+  demands:
+    - Agent.Name -equals C02FX1ZMMD6M-presidio
+
+variables:
+  buildConfiguration: 'Release'
+  dotnetSdkVersion: '9.0.x'
+  outputDir: '$(Build.ArtifactStagingDirectory)/publish'
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '$(dotnetSdkVersion)'
+    includePreviewVersions: true
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore NuGet packages'
+  inputs:
+    command: 'restore'
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build project'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish project'
+  inputs:
+    command: 'publish'
+    publishWebProjects: true
+    arguments: '--configuration $(buildConfiguration) --output $(outputDir)'
+    zipAfterPublish: true
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: drop'
+  inputs:
+    PathtoPublish: '$(outputDir)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
